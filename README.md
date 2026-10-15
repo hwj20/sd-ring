@@ -2,13 +2,17 @@
 
 A 3D-printable signet ring with a hidden **microSD card** slot. The card slides into the side of the head; a fingernail notch over the opening and a SIM-pin hole at the far end get it back out.
 
+> **Just want to print it?** Download [`print this.stl`](print%20this.stl), open it in your slicer and print it as is: flat side down, no supports. It's all 19 ring sizes on one plate. Try them on and keep the one that fits.
+>
+> **只想打印？** 下载 [`print this.stl`](print%20this.stl)，用切片软件打开直接打印：平面朝下，不加支撑。它是一整版 19 个尺寸，打完逐个试戴，留下合适的那个。
+
 [中文说明](#中文说明)
 
 ![Ring preview](images/ring_preview.png)
 
 ## What to print
 
-1. **Find your size.** Print [`stl/sizing_plate_US4-13.stl`](stl/sizing_plate_US4-13.stl): all 19 sizes (US 4–13, half sizes) on one plate, 133 × 111 mm, about 36 g of PLA. Each ring has its inner diameter engraved inside the band. Wear them and keep the one that slides over your knuckle with a little resistance and doesn't spin. The head is 13.4 mm wide, so it fits tighter than a thin band of the same size.
+1. **Find your size.** Print [`print this.stl`](print%20this.stl) (the same file as `stl/sizing_plate_US4-13.stl`): all 19 sizes (US 4–13, half sizes) on one plate, 133 × 111 mm, about 36 g of PLA. Each ring has its inner diameter engraved inside the band. Wear them and keep the one that slides over your knuckle with a little resistance and doesn't spin. The head is 13.4 mm wide, so it fits tighter than a thin band of the same size.
 2. **Print your ring** from [`stl/rings/`](stl/rings), named by inner diameter and US size, e.g. `sd_ring_17.3mm_US7.stl`. These are the same rings as on the plate.
 
 Already know your inner diameter? Skip step 1 and pick the closest file.
@@ -79,7 +83,7 @@ python src/sd_ring.py --set --out stl --no-preview   # rebuilds everything in st
 
 ### 打哪个文件
 
-1. **先确定尺寸**：打印 [`stl/sizing_plate_US4-13.stl`](stl/sizing_plate_US4-13.stl)，一版包含 19 个尺寸（美码 4–13，每半号一个），133 × 111 mm，PLA 大约 36 g。每个戒指内侧刻着它的内径。逐个试戴，选能稍微用力推过指关节、戴上不转的那个。戒面下方有 13.4 mm 宽，所以会比同尺寸的细戒指紧一些。
+1. **先确定尺寸**：打印 [`print this.stl`](print%20this.stl)（和 `stl/sizing_plate_US4-13.stl` 是同一个文件），一版包含 19 个尺寸（美码 4–13，每半号一个），133 × 111 mm，PLA 大约 36 g。每个戒指内侧刻着它的内径。逐个试戴，选能稍微用力推过指关节、戴上不转的那个。戒面下方有 13.4 mm 宽，所以会比同尺寸的细戒指紧一些。
 2. **打印你的戒指**：在 [`stl/rings/`](stl/rings) 里找对应文件，按内径和美码命名，例如 `sd_ring_17.3mm_US7.stl`，和整版上的戒指完全一样。
 
 已经知道自己的戒指内径的话，可以跳过第 1 步，直接选最接近的文件。尺寸对照见上面的表格（港码是近似值，约等于内周长 − 40）。
