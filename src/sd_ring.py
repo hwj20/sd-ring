@@ -1,17 +1,18 @@
 """Signet ring with a hidden microSD card slot -- parametric and 3D-printable.
 
-    python sd_ring.py                    # microSD, inner diameter 17.3 mm
-    python sd_ring.py --inner-d 18.2     # measure the inside of a ring that fits you
-    python sd_ring.py --resin            # tighter slot clearances for resin (SLA/DLP) printers
-    python sd_ring.py --card sd          # full-size SD: works, but the head is ~35 x 27 mm
-    python sd_ring.py --set              # sizing set: US 4..13 in half sizes, one plate
-    python sd_ring.py --set --us-range 6 10
+    python src/sd_ring.py                    # microSD, inner diameter 17.3 mm
+    python src/sd_ring.py --inner-d 18.2     # measure the inside of a ring that fits you
+    python src/sd_ring.py --resin            # tighter slot clearances for resin (SLA/DLP) printers
+    python src/sd_ring.py --card sd          # full-size SD: works, but the head is ~35 x 27 mm
+    python src/sd_ring.py --set              # sizing set: US 4..13 in half sizes, one plate
+    python src/sd_ring.py --set --us-range 6 10
+    python src/sd_ring.py --set --out stl --no-preview   # regenerates the STLs published in stl/
 
-Writes two STLs plus a preview into out/:
+Writes two STLs plus a preview into out/ (or --out DIR):
   *_signet.stl  symmetric signet; resin, or FDM lying flat with tree supports under the band
   *_flat.stl    one side planar so it prints on FDM lying flat with no supports at all
 --set instead writes flat rings with their inner diameter engraved inside the band, one STL
-per size in out/size_set/ plus all of them laid out on a single plate.
+per size in rings/ plus all of them laid out on a single plate, sizing_plate_US*.stl.
 
 Model frame: finger axis = Z, head on +Y, the card slides in from the +X side of the
 head. A pin hole in the -X end pushes it back out (SIM-tray pin), and a notch over the
@@ -285,8 +286,9 @@ GOLD, BLUE, DARK = (0.93, 0.75, 0.38), (0.25, 0.42, 0.85), (0.35, 0.2, 0.08)
 
 def make_set(args, out, cols=5, gap=4.0):
     """Flat rings for every half US size in range, diameter engraved, plus one plate with all of them."""
-    set_dir = out / "size_set"
+    set_dir = out / "rings"
     set_dir.mkdir(exist_ok=True)
+    suffix = "_resin" if args.resin else ""
     made = []
     print(" US   inner d   circumference  HK~   volume")
     for us in np.arange(args.us_range[0], args.us_range[1] + 1e-9, 0.5):
@@ -294,7 +296,7 @@ def make_set(args, out, cols=5, gap=4.0):
         ring, _, info = build(d, args.card, flat=True, resin=args.resin, detent=args.detent, label=f"{d:.1f}")
         assert info["status"] == "Error.NoError" and info["seated_overlap"] < 1e-6 and info["exit_overlap"] < 1e-6
         on_bed = ring.translate([0, 0, -ring.bounding_box()[2]])
-        write_stl(on_bed, set_dir / f"sd_ring_{d:.1f}mm_US{us:g}.stl")
+        write_stl(on_bed, set_dir / f"sd_ring_{d:.1f}mm_US{us:g}{suffix}.stl")
         made.append((us, d, ring, on_bed, info))
         print(f"{us:4g}   {d:5.1f} mm   {math.pi * d:6.1f} mm   {math.pi * d - 40:4.0f}   {info['volume']:.0f} mm3")
 
@@ -311,8 +313,8 @@ def make_set(args, out, cols=5, gap=4.0):
         y += row_h + gap
     plate = Manifold.compose(placed)
     x0, y0, _, x1, y1, z1 = plate.bounding_box()
-    name = f"sd_ring_size_set_US{args.us_range[0]:g}-{args.us_range[1]:g}{'_resin' if args.resin else ''}"
-    write_stl(plate, out / f"{name}_plate.stl")
+    name = f"sizing_plate_US{args.us_range[0]:g}-{args.us_range[1]:g}{suffix}"
+    write_stl(plate, out / f"{name}.stl")
     print(f"{len(made)} rings, plate {x1 - x0:.0f} x {y1 - y0:.0f} x {z1:.1f} mm, "
           f"{total / 1000:.1f} cm3 (PLA ~{total * 1.24e-3:.0f} g)")
 
@@ -335,11 +337,12 @@ def main():
     ap.add_argument("--detent", type=float, default=None, help="bump height in mm (0 = none; default 0.25 FDM / 0.1 resin)")
     ap.add_argument("--set", action="store_true", help="sizing set: every half US size in --us-range, one plate")
     ap.add_argument("--us-range", type=float, nargs=2, default=(4, 13), metavar=("MIN", "MAX"))
+    ap.add_argument("--out", type=Path, default=Path("out"), help="output directory (default: ./out)")
     ap.add_argument("--no-preview", action="store_true")
     args = ap.parse_args()
 
-    out = Path(__file__).with_name("out")
-    out.mkdir(exist_ok=True)
+    out = args.out
+    out.mkdir(parents=True, exist_ok=True)
     if args.set:
         make_set(args, out)
         return
